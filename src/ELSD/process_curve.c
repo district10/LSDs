@@ -95,11 +95,11 @@ void ellipse2param(double *p,double param[])
 void mean(double *v,int sz,double *m,int dim)
 {
   int i,j;
-  double sum[dim];
+  double *sum = malloc(sizeof(double)*dim);
+  for (i=0;i<dim;i++) sum[i] = 0.0;
   if (v == NULL) error("mean: Invalid pointer");
   if (sz<=0) error("mean: Invalid size");
   if (dim<=0) error("mean: Invalid size");
-  for (i=0;i<dim;i++) sum[i] = 0.0;
   for (i=0;i<sz;i++) 
     for (j=0;j<dim;j++)    
       sum[j]+=v[i*dim+j];
@@ -273,15 +273,15 @@ void fitcircle(int reg_size, double *vgg, double *param)
         A[i*4+j] += gBufferDouble[k*6+i]*gBufferDouble[k*6+j];
 
 #define SIZE4 4
+#define LWORK 16
   char JOBZ = 'V';
   char UPLO = 'U';
   int M = SIZE4;
   int LDA = M;
-  int LWORK = 4*SIZE4;
   int INFO;
   double W[SIZE4];
   double WORK[LWORK];
-  dsyev_(&JOBZ, &UPLO, &M, A, &LDA, W, WORK, &LWORK, &INFO); 
+  // dsyev_(&JOBZ, &UPLO, &M, A, &LDA, W, WORK, &LWORK, &INFO); 
  
   double s[9];
   s[0] = s[4] = A[0];
@@ -331,15 +331,15 @@ void fitellipse(int reg_size, double *vgg, double *param)
         A[i*6+j] += gBufferDouble[k*6+i]*gBufferDouble[k*6+j];
 
 #define SIZE6 6
+#define LWORK 24
   char JOBZ = 'V';
   char UPLO = 'U';    
   int M = SIZE6;
   int LDA = M;
-  int LWORK = 4*SIZE6;
   int INFO;
   double W[SIZE6];
   double WORK[LWORK];
-  dsyev_(&JOBZ, &UPLO, &M, A, &LDA, W, WORK, &LWORK, &INFO); 
+  // dsyev_(&JOBZ, &UPLO, &M, A, &LDA, W, WORK, &LWORK, &INFO); 
 
     
   double s[9];
