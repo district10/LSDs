@@ -24,8 +24,8 @@
 
 FILE* init_svg(char * filename, unsigned int xsize, unsigned int ysize );
 void fclose_svg(FILE *svg);
-void write_svg_ellipse(FILE *fe, FILE *svg,double *param,int *pext,int smooth);
-void write_svg_circle(FILE *fe, FILE *svg,double *param,int *pext,int smooth);
-void write_svg_line(FILE *svg, double *lin,int smooth);
+void write_svg_ellipse(FILE *svg,double *param,int *pext,int smooth, FILE *txt);
+void write_svg_circle(FILE *svg,double *param,int *pext,int smooth, FILE *txt);
+void write_svg_line(FILE *svg, double *lin,int smooth, FILE *txt);
 
 #endif

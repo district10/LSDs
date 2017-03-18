@@ -894,21 +894,21 @@ image_double ll_angle(image_double in,double threshold,struct coorlist **list_p,
         norm = sqrt( norm2 / 4.0 );
 
         (*grad)->data[adr] = norm;
-	(*gradx)->data[adr] = gx/2;
-	(*grady)->data[adr] = gy/2;
+    (*gradx)->data[adr] = gx/2;
+    (*grady)->data[adr] = gy/2;
         if(norm <= threshold) /* norm too small, gradient not defined */
             angles->data[adr] = NOTDEF;
         else
-	  {
+      {
             /* angle computation */
-	    angles->data[adr] = atan2(gy,gx);
+        angles->data[adr] = atan2(gy,gx);
             /* store the point in the right bin according to its norm */
             ind = (unsigned int) (norm * (double) n_bins / max_grad);
             if(ind >= n_bins) ind = n_bins-1;
             if(range_l_e[ind] == NULL)
                 range_l_s[ind] = range_l_e[ind] = list+list_count++;
             else
-	      {
+          {
                 range_l_e[ind]->next = list+list_count;
                 range_l_e[ind] = list+list_count++;
               }
@@ -1084,7 +1084,7 @@ void EllipseDetection(image_double image,double rho,double prec,double p,
   double reg_angle;
   int pext[8];
   unsigned int xsz0,ysz0;
-  char svgname[300];
+  char filename[300];
   xsz0 = image->xsize;
   ysz0 = image->ysize;
 
@@ -1103,8 +1103,17 @@ void EllipseDetection(image_double image,double rho,double prec,double p,
   ysize = angles->ysize;
 
   /* display detection result */
-  sprintf(svgname,"%s.svg",fstr);
-  svg = init_svg(svgname,xsz0,ysz0);
+  sprintf(filename,"%s.elsd.svg",fstr);
+  svg = init_svg(filename,xsz0,ysz0);
+
+  sprintf(filename,"%s.elsd.txt",fstr);
+  FILE *txt = fopen(filename,"w");
+  fprintf(txt, "#ELSD# %d %d %s (width height input)\n", xsz0, ysz0, fstr);
+  fprintf(txt, 
+      "# FORMAT:\n"
+      "#   line <x1> <y1> <x2> <y2>\n"
+      "#   circle <cx> <cy> <rx> <ry> <angle_start> <angle_end>\n"
+      "#   eclipse <x> <y> <rx> <ry> <rotation> <angle_start> <angle_end>\n");
   
   /* number of tests for elliptical arcs */
   logNT[2] = 4.0 *(log10((double)xsize)+log10((double)ysize)) + log10(9.0) + log10(3.0); /* N^8 */
@@ -1119,7 +1128,7 @@ void EllipseDetection(image_double image,double rho,double prec,double p,
   min_size[0] =(int)((-logNT[0]+log10(eps))/log10(p));
 
   /* file to write coordinates of detected ellipses */
-  FILE *fe = fopen("ellipses.txt","wt");
+  // FILE *fe = fopen("ellipses.txt","wt");
 
   /* allocate memory for region lists */
   reg = (struct point *) calloc(xsize * ysize, sizeof(struct point));
@@ -1140,7 +1149,7 @@ void EllipseDetection(image_double image,double rho,double prec,double p,
       reg_size = 0;
       if(used->data[list_p->y*used->xsize+list_p->x]==NOTUSED &&
          angles->data[list_p->y*angles->xsize+list_p->x] != NOTDEF)
-	{
+    {
           /* init some variables */ 	
           for (i=0;i<5;i++) 
             {
@@ -1148,13 +1157,13 @@ void EllipseDetection(image_double image,double rho,double prec,double p,
             }
           nfa[2] = nfa[1] = nfa[0] = mlog10eps; 
           reg_size = 1;regp_size[0] = regp_size[1] = regp_size[2] = 0;
-	  region_grow(list_p->x, list_p->y, angles, reg, &reg_size, &reg_angle,
+      region_grow(list_p->x, list_p->y, angles, reg, &reg_size, &reg_angle,
                           used, prec); 
                                
 
-	  /*-------- FIT A LINEAR SEGMENT AND VERIFY IF VALID ------------------- */
-	  valid_line(reg,&reg_size,reg_angle,prec,p,&rec,lin,grad,gradx,grady, 
-	             used,angles,density_th,logNT[0],mlog10eps,&nfa[0]); 
+      /*-------- FIT A LINEAR SEGMENT AND VERIFY IF VALID ------------------- */
+      valid_line(reg,&reg_size,reg_angle,prec,p,&rec,lin,grad,gradx,grady, 
+                 used,angles,density_th,logNT[0],mlog10eps,&nfa[0]); 
           regp_size[0] = reg_size;
 
           for (i=0;i<regp_size[0];i++) {regl[i].x = reg[i].x; regl[i].y = reg[i].y; }
@@ -1174,7 +1183,7 @@ void EllipseDetection(image_double image,double rho,double prec,double p,
                     fprintf(fe,"%f %f %f %f %f \n",parame[0]*1.25,parame[1]*1.25,parame[2]*1.25,parame[3]*1.25,parame[4]);
                   else  
                     fprintf(fe,"%f %f %f %f %f \n",parame[0],parame[1],parame[2],parame[3],parame[4]);*/
-                  write_svg_ellipse(fe,svg,parame,pext,smooth);
+                  write_svg_ellipse(svg,parame,pext,smooth, txt);
                   for (i=0;i<regp_size[0];i++)
                         used->data[regl[i].y*used->xsize+regl[i].x] = NOTUSED;
                   for (i=0;i<regp_size[1];i++)
@@ -1193,7 +1202,7 @@ void EllipseDetection(image_double image,double rho,double prec,double p,
                          fprintf(fe,"%f %f %f %f %f \n",paramc[0]*1.25,paramc[1]*1.25,paramc[2]*1.25,paramc[3]*1.25,paramc[4]);
                        else  
                          fprintf(fe,"%f %f %f %f %f \n",paramc[0],paramc[1],paramc[2],paramc[3],paramc[4]);*/
-                       write_svg_circle(fe,svg,paramc,pext,smooth);
+                       write_svg_circle(svg,paramc,pext,smooth, txt);
                        for (i=0;i<regp_size[0];i++)
                          used->data[regl[i].y*used->xsize+regl[i].x] = NOTUSED;
                        for (i=0;i<regp_size[2];i++)
@@ -1207,8 +1216,8 @@ void EllipseDetection(image_double image,double rho,double prec,double p,
                    else if(nfa[0]>mlog10eps && regp_size[0]>min_size[0] && nfa[0]>nfa[1] && nfa[0]>nfa[2]) /* line */
                           {
                             (*line_count)++;
-			    write_svg_line(svg,lin,smooth);                    
-		            for (i=0;i<regp_size[1];i++)
+                write_svg_line(svg,lin,smooth,txt);
+                    for (i=0;i<regp_size[1];i++)
                               used->data[regc[i].y*used->xsize+regc[i].x] = NOTUSED;
                             for (i=0;i<regp_size[2];i++)
                               used->data[rege[i].y*used->xsize+rege[i].x] = NOTUSED;
@@ -1238,7 +1247,7 @@ void EllipseDetection(image_double image,double rho,double prec,double p,
   free(reg);free(regl); free(regc); free(rege); 
   free(gBufferDouble); free(gBufferInt); 
   free(mem_p);
-  fclose(fe);
+  fclose(txt);
   fclose_svg(svg);
 }
 /*----------------------------------------------------------------------------*/
@@ -1274,7 +1283,7 @@ int check_ellipse(double *param)
 /*----------------------------------------------------------------------------*/
 int main(int argc, char **argv)
 {
-  if (argc<2) error("use : ./elsd image_name.pgm");
+  if (argc<2) error("use : ./elsd image_name.pgm [eps(default: 1.0)] [smooth(1:true, 0:false)]");
   double quant = 2.0;       /* Bound to the quantization error on the
                                 gradient norm.                                */
   double ang_th = 22.5;     /* Gradient angle tolerance in degrees.           */
@@ -1282,7 +1291,9 @@ int main(int argc, char **argv)
   double prec = M_PI*ang_th/180.0; /* radian precision */
   double rho = quant/sin(prec);
   double eps = 1; //atof(argv[2]);
+  if (argc > 2) { eps = atof(argv[2]); }
   int smooth = 1; //atoi(argv[3]);
+  if (argc > 3) { smooth = atoi(argv[3]); }
   int ell_count = 0, line_count = 0, circ_count = 0;
   image_double image;
 

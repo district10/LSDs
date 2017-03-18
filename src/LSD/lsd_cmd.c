@@ -1087,6 +1087,10 @@ int main(int argc, char ** argv)
   if( strcmp(get_str(arg,"out"),"-") == 0 ) output = stdout;
   else output = fopen(get_str(arg,"out"),"w");
   if( output == NULL ) error("Error: unable to open ASCII output file.");
+  fprintf(output, 
+      "#LSD# %d %d %s (width height input)\n"
+      "# FORMAT: x1, y1, x2, y2, width, p, -log10(NFA)\n", X, Y, get_str(arg, "in"));
+
   for(i=0;i<n;i++)
     {
       for(j=0;j<dim;j++)

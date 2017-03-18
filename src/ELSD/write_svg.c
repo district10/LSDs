@@ -42,6 +42,7 @@ FILE* init_svg(char * filename, unsigned int xsize, unsigned int ysize )
   fprintf(svg,"<svg width=\"%upx\" height=\"%upx\" ",xsize,ysize);
   fprintf(svg,"version=\"1.1\"\n xmlns=\"http://www.w3.org/2000/svg\" ");
   fprintf(svg,"xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n");
+  // "<image x=\"0\" y=\"0\" width="2048px" height="1024px" opacity="1" xlink:href="texture1.jpg"/>
   //fprintf(svg,"<rect x=\"%d\" y=\"%d\" width=\"%d\" height=\"%d\"",1,1,xsize,ysize);
   //fprintf(svg, " fill=\"none\" stroke=\"black\" stroke-width=\"%d\" />\n",1);
 
@@ -65,7 +66,7 @@ void fclose_svg(FILE *svg)
 
 
 /*----------------------------------------------------------------------------*/
-void write_svg_line(FILE *svg, double *lin,int smooth)
+void write_svg_line(FILE *svg, double *lin,int smooth, FILE *txt)
 {
   /* write line segment */
 
@@ -78,15 +79,18 @@ void write_svg_line(FILE *svg, double *lin,int smooth)
     }
   fprintf(svg,"<line x1=\"%f\" y1=\"%f\" x2=\"%f\" y2=\"%f\" ",
               lin[0],lin[1],lin[2],lin[3]);
-  fprintf(svg," fill=\"none\" stroke =\"green\" stroke-width=\"%d\" />\n",1);
+  fprintf(svg," fill=\"none\" stroke =\"black\" stroke-width=\"%d\" />\n",1);
   //fprintf(svg," fill=\"none\" stroke =\"black\" stroke-width=\"%d\" />\n",1);
+  if (txt) {
+    fprintf(txt, "line %f %f %f %f\n", lin[0],lin[1],lin[2],lin[3]);
+  }
 }
 /*---------------------------------------------------------------------------*/
 
 
 
 /*----------------------------------------------------------------------------*/
-void write_svg_circle(FILE *fe, FILE *svg,double *param,int *pext,int smooth)
+void write_svg_circle(FILE *svg,double *param,int *pext,int smooth, FILE *txt)
 {
   int fa=0,fs=1;
   double ang_start,ang_end;
@@ -122,19 +126,21 @@ void write_svg_circle(FILE *fe, FILE *svg,double *param,int *pext,int smooth)
 
       if ((ang_end-ang_start)>M_PI) fa = 1;
       fprintf(svg,"<path d=\"M %f,%f A%f,%f %f %d,%d %f,%f\"",
-	x1,y1,param[2],param[2],0.0,fa,fs,x2,y2);
+    x1,y1,param[2],param[2],0.0,fa,fs,x2,y2);
       fprintf(svg," fill=\"none\" stroke =\"blue\" stroke-width=\"%d\" />\n",1); 
       //fprintf(svg," fill=\"none\" stroke =\"black\" stroke-width=\"%d\" />\n",1);   
     }
-  fprintf(fe,"%f %f %f %f %f %f %f\n",param[0],param[1],param[2],param[3],param[4],ang_start,ang_end);
-
+  // fprintf(fe,"%f %f %f %f %f %f %f\n",param[0],param[1],param[2],param[3],param[4],ang_start,ang_end);
+  if (txt) {
+    fprintf(txt, "circle %f %f %f %f %f %f %f\n", param[0], param[1], param[2], param[3], param[4], ang_start, ang_end);
+  }
 }
 /*---------------------------------------------------------------------------*/
 
 
 
 /*----------------------------------------------------------------------------*/
-void write_svg_ellipse(FILE *fe, FILE *svg,double *param,int *pext,int smooth)
+void write_svg_ellipse(FILE *svg,double *param,int *pext,int smooth, FILE *txt)
 {
   int fa=0,fs=1;
   double ang_start,ang_end;
@@ -171,12 +177,15 @@ void write_svg_ellipse(FILE *fe, FILE *svg,double *param,int *pext,int smooth)
 
      
       fprintf(svg,"<path d=\"M %f,%f A%f,%f %f %d,%d %f,%f\"",
-	x1,y1,param[2],param[3],param[4]*180/M_PI,fa,fs,x2,y2);
+    x1,y1,param[2],param[3],param[4]*180/M_PI,fa,fs,x2,y2);
       fprintf(svg," fill=\"none\" stroke =\"red\" stroke-width=\"%d\" />\n",1);   
       //fprintf(svg," fill=\"none\" stroke =\"black\" stroke-width=\"%d\" />\n",1); 
       
     }
-  fprintf(fe,"%f %f %f %f %f %f %f\n",param[0],param[1],param[2],param[3],param[4],ang_start,ang_end);
+  // fprintf(fe,"%f %f %f %f %f %f %f\n",param[0],param[1],param[2],param[3],param[4],ang_start,ang_end);
+  if (txt) {
+    fprintf(txt, "ellipse %f %f %f %f %f %f %f\n", param[0], param[1], param[2], param[3], param[4], ang_start, ang_end);
+  }
 
 }
 /*---------------------------------------------------------------------------*/
