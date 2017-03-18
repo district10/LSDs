@@ -10,8 +10,8 @@ Usage:
 
 ## LSD
 
-![](https://cdn.rawgit.com/district10/lsds/master/pano.pgm.lsd.svg)
+![](https://cdn.rawgit.com/district10/LSDs/master/pano.pgm.lsd.svg)
 
 ## ELSD
 
-![](https://cdn.rawgit.com/district10/lsds/master/pano.pgm.elsd.svg)
+![](https://cdn.rawgit.com/district10/LSDs/master/pano.pgm.elsd.svg)
