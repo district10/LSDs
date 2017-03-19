@@ -9,7 +9,7 @@ pano.pgm: pano.jpg
 	convert $< $@
 
 pano.pgm.lsd.txt: pano.pgm
-	${lsd} -S pano.pgm.lsd.svg $< $@
+	${lsd} -S pano.pgm.lsd.svg -W 1.0 $< $@
 pano.pgm.elsd.txt: pano.pgm
 	${elsd} $<
 
