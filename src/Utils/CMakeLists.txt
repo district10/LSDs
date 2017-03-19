@@ -1,0 +1,6 @@
+file( GLOB SRCS *.cpp)
+foreach( src ${SRCS} )
+    string( REGEX REPLACE "(^.*/|.cpp$)" "" exe ${src} )
+    add_executable( ${exe} ${src} )
+    set_target_properties( ${exe} PROPERTIES FOLDER Utils )
+endforeach( src )
